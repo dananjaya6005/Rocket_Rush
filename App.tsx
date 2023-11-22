@@ -2,16 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 
 function Timer() {
-  const min = 1;
-  const max = 10;
+
   const [time, setTime] = useState(1);
   const [stopTime, setStopTime] = useState(Math.floor(Math.random() * 20) * 30);
-  const randomInRange = Math.random() * (max - min) + min;
   const [bet ,setBet] = useState(100);
-  const [BtnShow, SetBtnShow] = useState(true);
-  const [profit, setProfit] = useState(0);
+  const [placeBetBtnShow , setPlaceBetBtnShow] = useState(true);
+  const [TakeProfitBtnShow, setTakeProfitBtnShow] = useState(false);
+  const [AccoutBalance, setAccountBalance] = useState(1000);
+
+ const [runningFlow, setRunningFlow] = useState(true);
+
+const [profit, setProfit] = useState(0);
  const [restartFlow, setResartFlow] = useState(false);
+ const [isPlacedBet , setIsPlaceBet] = useState(false);
   
+const [isUserTakeProfit, setIsUserTakeProfit] = useState(undefined);
+
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTime(time + 1);
@@ -19,23 +26,28 @@ function Timer() {
 
     if(time >= stopTime) {
       clearInterval(timer);
-      
+      setRunningFlow(false);
       setResartFlow(!restartFlow);
-      SetBtnShow(false);
+      setTakeProfitBtnShow(false);
+    }
+    else{
+      setRunningFlow(true);
     }
 
    
-
 
     return () => clearInterval(timer);
   }, [time]);
 
 
   useEffect(() => {
+    setPlaceBetBtnShow(true);
+    setIsUserTakeProfit(undefined);
+    setProfit(0);
     //wait 3 seconds then start the timer
     setTimeout(() => {
       setTime(1);
-      SetBtnShow(true);
+      setPlaceBetBtnShow(false);
       setStopTime(Math.floor(Math.random() * 20) * 30);
     }, 10000); // waits for 4 seconds
     
@@ -50,22 +62,51 @@ function Timer() {
     color = "purple";
   }
 
+  useEffect(() => {
+   handleLoss();
+  }, [runningFlow]);
+
+
+  function handleLoss(){
+    if (!runningFlow && isUserTakeProfit === false) {
+      setAccountBalance(AccoutBalance - bet);
+    }
+
+  }
+  
+
 
   function handleTakeProfit() {
-    setProfit(bet*time/100);
-    SetBtnShow(false);
+    if(runningFlow === true){
+      setProfit(bet*time/100);
+      setAccountBalance(AccoutBalance + bet*time/100);
+      setIsUserTakeProfit(true);
+    }
+  
+    setTakeProfitBtnShow(false);
+  }
+
+
+  function placeBet() {
+  
+    setPlaceBetBtnShow(false);
+    setTakeProfitBtnShow(true);
+    setIsUserTakeProfit(false);
   }
 
 
   return (
     <View style={styles.container}>
+      <Text>{AccoutBalance}</Text>
       <Text style={[styles.TimerText, {color: color}]}>X {Math.floor(time / 100)}.{time % 100}</Text>
       <Text style={[styles.TimerText, {color: color}]}>Stop Time: {Math.floor(stopTime / 100)}.{stopTime % 100}</Text>
       <Text>{bet*time/100}</Text>
       <Text>{profit}</Text>
       <Button 
-      disabled={!BtnShow}
+      disabled={!TakeProfitBtnShow}
       title="Take Profit" onPress={handleTakeProfit} />
+
+      <Button title="place bet" disabled={!placeBetBtnShow} onPress={placeBet}/>
     </View>
   );
 }

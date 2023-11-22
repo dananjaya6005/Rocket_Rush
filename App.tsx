@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, Button,ImageBackground } from 'react-native';
+import BgImage from './src/Image/BgImage.jpg';
 
-function Timer() {
+
+function App() {
 
   const [time, setTime] = useState(1);
   const [stopTime, setStopTime] = useState(Math.floor(Math.random() * 20) * 30);
@@ -96,22 +98,27 @@ const [isUserTakeProfit, setIsUserTakeProfit] = useState(undefined);
 
 
   return (
+    
     <View style={styles.container}>
-      <Text>{AccoutBalance}</Text>
+      <ImageBackground source={BgImage} style={styles.image}>
+      <Text style={styles.common_text}>{AccoutBalance}</Text>
       <Text style={[styles.TimerText, {color: color}]}>X {Math.floor(time / 100)}.{time % 100}</Text>
       <Text style={[styles.TimerText, {color: color}]}>Stop Time: {Math.floor(stopTime / 100)}.{stopTime % 100}</Text>
-      <Text>{bet*time/100}</Text>
-      <Text>{profit}</Text>
+      <Text style={styles.common_text}>{bet*time/100}</Text>
+      <Text style={styles.common_text}>{profit}</Text>
       <Button 
       disabled={!TakeProfitBtnShow}
       title="Take Profit" onPress={handleTakeProfit} />
 
       <Button title="place bet" disabled={!placeBetBtnShow} onPress={placeBet}/>
+      </ImageBackground>
     </View>
+    
+   
   );
 }
 
-export default Timer;
+export default App;
 
 //create styles for this component
 const styles = StyleSheet.create({
@@ -123,5 +130,17 @@ const styles = StyleSheet.create({
   },
   TimerText:{
     fontSize: 50,
+  },
+  image: {
+    flex: 1,
+    resizeMode : "cover",
+    justifyContent: 'center',
+    width: '100%',
+  },
+  common_text:{
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
   }
 });
